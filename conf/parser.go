@@ -230,7 +230,7 @@ func FromWgQuick(s string, name string) (*Config, error) {
 		}
 		equals := strings.IndexByte(line, '=')
 		if equals < 0 {
-			return nil, &ParseError{l18n.Sprintf("Invalid config key is missing an equals separator"), line}
+			return nil, &ParseError{l18n.Sprintf("Config key is missing an equals separator"), line}
 		}
 		key, val := strings.TrimSpace(lineLower[:equals]), strings.TrimSpace(line[equals+1:])
 		if len(val) == 0 {
@@ -277,9 +277,10 @@ func FromWgQuick(s string, name string) (*Config, error) {
 				for _, address := range addresses {
 					a := net.ParseIP(address)
 					if a == nil {
-						return nil, &ParseError{l18n.Sprintf("Invalid IP address"), address}
+						conf.Interface.DNSSearch = append(conf.Interface.DNSSearch, address)
+					} else {
+						conf.Interface.DNS = append(conf.Interface.DNS, a)
 					}
-					conf.Interface.DNS = append(conf.Interface.DNS, a)
 				}
 			default:
 				return nil, &ParseError{l18n.Sprintf("Invalid key for [Interface] section"), key}
@@ -366,6 +367,7 @@ func FromUAPI(s string, existingConfig *Config) (*Config, error) {
 		Interface: Interface{
 			Addresses: existingConfig.Interface.Addresses,
 			DNS:       existingConfig.Interface.DNS,
+			DNSSearch: existingConfig.Interface.DNSSearch,
 			MTU:       existingConfig.Interface.MTU,
 		},
 	}
@@ -376,7 +378,7 @@ func FromUAPI(s string, existingConfig *Config) (*Config, error) {
 		}
 		equals := strings.IndexByte(line, '=')
 		if equals < 0 {
-			return nil, &ParseError{l18n.Sprintf("Invalid config key is missing an equals separator"), line}
+			return nil, &ParseError{l18n.Sprintf("Config key is missing an equals separator"), line}
 		}
 		key, val := line[:equals], line[equals+1:]
 		if len(val) == 0 {
