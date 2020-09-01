@@ -30,7 +30,11 @@ To translate WireGuard UI to your language:
 
 1. Upgrade `resources.rc` accordingly. Follow the pattern.
 
-2. Add your language ID to the `//go:generate ... -lang=en,<langID>...` line in `gotext.go`.
+2. Make a new directory in `locales\` containing the language ID:
+
+  ```
+  C:\Projects\wireguard-windows> mkdir locales\<langID>
+  ```
 
 3. Configure and run `build` to prepare initial `locales\<langID>\messages.gotext.json` file:
 
@@ -40,7 +44,7 @@ To translate WireGuard UI to your language:
    C:\Projects\wireguard-windows> copy locales\<langID>\out.gotext.json locales\<langID>\messages.gotext.json
    ```
 
-4. Translate `locales\<langID>\messages.gotext.json`. See other language message files how to translate messages and how to tackle plural.
+4. Translate `locales\<langID>\messages.gotext.json`. See other language message files how to translate messages and how to tackle plural. For this step, the project is currently using [CrowdIn](https://crowdin.com/translate/WireGuard); please make sure your translations make it there in order to be added here.
 
 5. Run `build` from the step 3 again, and test.
 
