@@ -13,3 +13,4 @@
 *.syso
 .idea
 *.ico
+/vendor/

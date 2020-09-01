@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"golang.org/x/sys/windows"
-	"golang.zx2c4.com/wireguard/conn"
 	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/tun"
 	"golang.zx2c4.com/wireguard/windows/tunnel/winipcfg"
@@ -52,18 +51,18 @@ func bindSocketRoute(family winipcfg.AddressFamily, device *device.Device, ourLU
 	// disable this because if my peers are on different interfaces...well i don't know how it can work.  i can't
 	// bind the socket to only one of them
 	/*
-	blackhole := blackholeWhenLoop && index == 0
-	bind, _ := device.Bind().(conn.BindSocketToInterface)
-	if bind == nil {
-		return nil
-	}
-	if family == windows.AF_INET {
-		log.Printf("Binding v4 socket to interface %d (blackhole=%v)", index, blackhole)
-		return bind.BindSocketToInterface4(index, blackhole)
-	} else if family == windows.AF_INET6 {
-		log.Printf("Binding v6 socket to interface %d (blackhole=%v)", index, blackhole)
-		return bind.BindSocketToInterface6(index, blackhole)
-	}
+		blackhole := blackholeWhenLoop && index == 0
+		bind, _ := device.Bind().(conn.BindSocketToInterface)
+		if bind == nil {
+			return nil
+		}
+		if family == windows.AF_INET {
+			log.Printf("Binding v4 socket to interface %d (blackhole=%v)", index, blackhole)
+			return bind.BindSocketToInterface4(index, blackhole)
+		} else if family == windows.AF_INET6 {
+			log.Printf("Binding v6 socket to interface %d (blackhole=%v)", index, blackhole)
+			return bind.BindSocketToInterface6(index, blackhole)
+		}
 	*/
 	return nil
 }
