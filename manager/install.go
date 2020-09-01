@@ -161,6 +161,9 @@ func InstallTunnel(configPath string) error {
 		SidType:      windows.SERVICE_SID_TYPE_UNRESTRICTED,
 	}
 	service, err = m.CreateService(serviceName, path, config, "/tunnelservice", configPath)
+	//service, err = m.CreateService(serviceName, "C:\\Users\\Christopher Ng\\AppData\\Roaming\\JetBrains\\IntelliJIdea2020.1\\plugins\\intellij-go\\lib\\dlv\\windows\\dlv.exe", config,
+	//	"--listen=:2345", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", path, "/tunnelservice", configPath)
+
 	if err != nil {
 		return err
 	}

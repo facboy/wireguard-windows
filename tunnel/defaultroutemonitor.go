@@ -6,7 +6,6 @@
 package tunnel
 
 import (
-	"log"
 	"sync"
 	"time"
 
@@ -50,6 +49,9 @@ func bindSocketRoute(family winipcfg.AddressFamily, device *device.Device, ourLU
 	}
 	*lastLUID = luid
 	*lastIndex = index
+	// disable this because if my peers are on different interfaces...well i don't know how it can work.  i can't
+	// bind the socket to only one of them
+	/*
 	blackhole := blackholeWhenLoop && index == 0
 	if family == windows.AF_INET {
 		log.Printf("Binding v4 socket to interface %d (blackhole=%v)", index, blackhole)
@@ -58,6 +60,7 @@ func bindSocketRoute(family winipcfg.AddressFamily, device *device.Device, ourLU
 		log.Printf("Binding v6 socket to interface %d (blackhole=%v)", index, blackhole)
 		return device.BindSocketToInterface6(index, blackhole)
 	}
+	*/
 	return nil
 }
 
