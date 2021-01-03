@@ -14,3 +14,7 @@
 .idea
 *.ico
 /vendor/
+
+# Idea stuff
+.idea_build/
+*.iml
