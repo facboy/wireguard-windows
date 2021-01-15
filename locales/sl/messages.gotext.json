@@ -60,9 +60,9 @@
             ]
         },
         {
-            "id": "You must use the 64-bit version of WireGuard on this computer.",
-            "message": "You must use the 64-bit version of WireGuard on this computer.",
-            "translation": "Na temu računalniku morate uporabiti 64-bitno različico WireGuarda.",
+            "id": "You must use the native version of WireGuard on this computer.",
+            "message": "You must use the native version of WireGuard on this computer.",
+            "translation": "Na temu računalniku morate uporabiti enako-arhitekturno različico WireGuarda.",
             "translatorComment": "Copied from source."
         },
         {
@@ -526,6 +526,12 @@
             "translatorComment": "Copied from source."
         },
         {
+            "id": "Config key is missing an equals separator",
+            "message": "Config key is missing an equals separator",
+            "translation": "Ključu v konfiguraciji manjka ločilo enačaj",
+            "translatorComment": "Copied from source."
+        },
+        {
             "id": "Key must have a value",
             "message": "Key must have a value",
             "translation": "Ključ mora imeti vrednost",
@@ -610,9 +616,9 @@
             "translatorComment": "Copied from source."
         },
         {
-            "id": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}\nOperating system: {OsName}\nArchitecture: {GOARCH}",
-            "message": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}\nOperating system: {OsName}\nArchitecture: {GOARCH}",
-            "translation": "Verzija aplikacije: {Number}\nVerzija wireguard-go: {WireGuardGoVersion}\nVerzija Go: {Version_go}\nOperacijski sistem: {OsName}\nArhitektura: {GOARCH}",
+            "id": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}-{GOARCH}\nOperating system: {OsName}\nArchitecture: {NativeArch}",
+            "message": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}-{GOARCH}\nOperating system: {OsName}\nArchitecture: {NativeArch}",
+            "translation": "Verzija aplikacije: {Number}\nVerzija wireguard-go: {WireGuardGoVersion}\nVerzija Go: {Version_go}-{GOARCH}\nOperacijski sistem: {OsName}\nArhitektura: {NativeArch}",
             "translatorComment": "Copied from source.",
             "placeholders": [
                 {
@@ -640,20 +646,28 @@
                     "expr": "strings.TrimPrefix(runtime.Version(), \"go\")"
                 },
                 {
-                    "id": "OsName",
+                    "id": "GOARCH",
                     "string": "%[4]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 4,
-                    "expr": "version.OsName()"
+                    "expr": "runtime.GOARCH"
                 },
                 {
-                    "id": "GOARCH",
+                    "id": "OsName",
                     "string": "%[5]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 5,
-                    "expr": "runtime.GOARCH"
+                    "expr": "version.OsName()"
+                },
+                {
+                    "id": "NativeArch",
+                    "string": "%[6]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 6,
+                    "expr": "version.NativeArch()"
                 }
             ]
         },
@@ -718,6 +732,12 @@
             "translatorComment": "Copied from source."
         },
         {
+            "id": "Scripts:",
+            "message": "Scripts:",
+            "translation": "Skripta:",
+            "translatorComment": "Copied from source."
+        },
+        {
             "id": "Preshared key:",
             "message": "Preshared key:",
             "translation": "Ključ v skupni rabi:",
@@ -751,6 +771,36 @@
             "id": "Transfer:",
             "message": "Transfer:",
             "translation": "Prenos:",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "pre-up",
+            "message": "pre-up",
+            "translation": "pred-aktivacijo",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "post-up",
+            "message": "post-up",
+            "translation": "po-aktivaciji",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "pre-down",
+            "message": "pre-down",
+            "translation": "pred-deaktivacijo",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "post-down",
+            "message": "post-down",
+            "translation": "po-deaktivaciji",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "disabled, per policy",
+            "message": "disabled, per policy",
+            "translation": "onemogočeno, zaradi politike",
             "translatorComment": "Copied from source."
         },
         {
@@ -860,9 +910,9 @@
             "translatorComment": "Copied from source."
         },
         {
-            "id": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface, with special exceptions for DHCP and NDP.",
-            "message": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface, with special exceptions for DHCP and NDP.",
-            "translation": "Kadar ima konfiguracija natanko enega vrstnika in njegov spisek dovoljenih IP-jev vsebuje vsaj enega izmed 0.0.0.0/0 ali ::/0, bo storitev tunela vzpostavila pravila požarnega zidu, ki bodo blokirala ves promet, ki ni niti za niti iz vmesnika tunela s posebnimi izjemami za DHCP and NDP.",
+            "id": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface or is to the wrong DNS server, with special exceptions for DHCP and NDP.",
+            "message": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface or is to the wrong DNS server, with special exceptions for DHCP and NDP.",
+            "translation": "Kadar ima konfiguracija natanko enega vrstnika in njegov spisek dovoljenih IP-jev vsebuje vsaj enega izmed 0.0.0.0/0 ali ::/0, bo storitev tunela vzpostavila pravila požarnega zidu, ki bodo blokirala ves promet, ki ni niti za niti iz vmesnika tunela oz. za napačen strežnik DNS, s posebnimi izjemami za DHCP and NDP.",
             "translatorComment": "Copied from source."
         },
         {
@@ -1148,58 +1198,10 @@
             "translatorComment": "Copied from source."
         },
         {
-            "id": "WireGuard Tunnel Error",
-            "message": "WireGuard Tunnel Error",
-            "translation": "Napaka tunela WireGuard",
+            "id": "&Tunnels",
+            "message": "&Tunnels",
+            "translation": "&Tuneli",
             "translatorComment": "Copied from source."
-        },
-        {
-            "id": "WireGuard: {TextForStateglobalState_true}",
-            "message": "WireGuard: {TextForStateglobalState_true}",
-            "translation": "WireGuard: {TextForStateglobalState_true}",
-            "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "TextForStateglobalState_true",
-                    "string": "%[1]s",
-                    "type": "string",
-                    "underlyingType": "string",
-                    "argNum": 1,
-                    "expr": "textForState(globalState, true)"
-                }
-            ]
-        },
-        {
-            "id": "Status: {StateText}",
-            "message": "Status: {StateText}",
-            "translation": "Status: {StateText}",
-            "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "StateText",
-                    "string": "%[1]s",
-                    "type": "string",
-                    "underlyingType": "string",
-                    "argNum": 1,
-                    "expr": "stateText"
-                }
-            ]
-        },
-        {
-            "id": "Addresses: {String}",
-            "message": "Addresses: {String}",
-            "translation": "Naslovi: {String}",
-            "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "String",
-                    "string": "%[1]s",
-                    "type": "string",
-                    "underlyingType": "string",
-                    "argNum": 1,
-                    "expr": "sb.String()"
-                }
-            ]
         },
         {
             "id": "WireGuard Activated",
@@ -1242,6 +1244,60 @@
                     "underlyingType": "string",
                     "argNum": 1,
                     "expr": "tunnel.Name"
+                }
+            ]
+        },
+        {
+            "id": "WireGuard Tunnel Error",
+            "message": "WireGuard Tunnel Error",
+            "translation": "Napaka tunela WireGuard",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "WireGuard: {TextForStateglobalState_true}",
+            "message": "WireGuard: {TextForStateglobalState_true}",
+            "translation": "WireGuard: {TextForStateglobalState_true}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "TextForStateglobalState_true",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "textForState(globalState, true)"
+                }
+            ]
+        },
+        {
+            "id": "Status: {StateText}",
+            "message": "Status: {StateText}",
+            "translation": "Status: {StateText}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "StateText",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "stateText"
+                }
+            ]
+        },
+        {
+            "id": "Addresses: {EnumerationSeparator}",
+            "message": "Addresses: {EnumerationSeparator}",
+            "translation": "Naslovi: {EnumerationSeparator}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "EnumerationSeparator",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "strings.Join(addrs, l18n.EnumerationSeparator())"
                 }
             ]
         },
@@ -1321,6 +1377,12 @@
             "id": "&Remove selected tunnel(s)",
             "message": "&Remove selected tunnel(s)",
             "translation": "Odst&rani izbrane tunele",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "no configuration files were found",
+            "message": "no configuration files were found",
+            "translation": "ni najdenih konfiguracijskih datotek",
             "translatorComment": "Copied from source."
         },
         {

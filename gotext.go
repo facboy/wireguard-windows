@@ -3,7 +3,7 @@
 
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
  */
 
 package main
@@ -65,7 +65,7 @@ func main() {
 		panic(err)
 	}
 	cmd = exec.Command(gotextFilename, "-srclang=en", "update", "-out=zgotext.go", "-lang="+strings.Join(langs, ","))
-	cmd.Env = append(os.Environ(), "GOOS=windows", "GOARCH=amd64", "CGO_ENABLED=1", "CC=x86_64-w64-mingw32-gcc")
+	cmd.Env = append(os.Environ(), "GOOS=windows", "GOARCH=amd64")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()

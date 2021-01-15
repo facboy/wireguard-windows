@@ -60,9 +60,9 @@
             ]
         },
         {
-            "id": "You must use the 64-bit version of WireGuard on this computer.",
-            "message": "You must use the 64-bit version of WireGuard on this computer.",
-            "translation": "Используйте 64-битную версию WireGuard на этом компьютере.",
+            "id": "You must use the native version of WireGuard on this computer.",
+            "message": "You must use the native version of WireGuard on this computer.",
+            "translation": "Используйте нативную версию WireGuard на этом компьютере.",
             "translatorComment": "Copied from source."
         },
         {
@@ -516,13 +516,19 @@
         {
             "id": "Tunnel name is not valid",
             "message": "Tunnel name is not valid",
-            "translation": "Неправильное имя туннеля",
+            "translation": "Название туннеля недействительно",
             "translatorComment": "Copied from source."
         },
         {
             "id": "Line must occur in a section",
             "message": "Line must occur in a section",
             "translation": "Строка должна быть в секции",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "Config key is missing an equals separator",
+            "message": "Config key is missing an equals separator",
+            "translation": "В ключе конфигурации отсутствует разделитель",
             "translatorComment": "Copied from source."
         },
         {
@@ -558,7 +564,7 @@
         {
             "id": "All peers must have public keys",
             "message": "All peers must have public keys",
-            "translation": "Все пиры должны иметь открытые ключи",
+            "translation": "Все пиры должны иметь публичные ключи",
             "translatorComment": "Copied from source."
         },
         {
@@ -582,7 +588,7 @@
         {
             "id": "Invalid key for peer section",
             "message": "Invalid key for peer section",
-            "translation": "Неверный ключ для секции Пира",
+            "translation": "Недействительный ключ для секции пира",
             "translatorComment": "Copied from source."
         },
         {
@@ -610,9 +616,9 @@
             "translatorComment": "Copied from source."
         },
         {
-            "id": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}\nOperating system: {OsName}\nArchitecture: {GOARCH}",
-            "message": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}\nOperating system: {OsName}\nArchitecture: {GOARCH}",
-            "translation": "Версия приложения: {Number}\nВерсия бэкэнда: {WireGuardGoVersion}\nВерсия перехода: {Version_go}\nОперационная система: {OsName}\nАрхитектура: {GOARCH}",
+            "id": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}-{GOARCH}\nOperating system: {OsName}\nArchitecture: {NativeArch}",
+            "message": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}-{GOARCH}\nOperating system: {OsName}\nArchitecture: {NativeArch}",
+            "translation": "Версия приложения: {Number}\nВерсия Go-бэкенда: {WireGuardGoVersion}\nВерсия Go: {Version_go}-{GOARCH}\nОперационная система: {OsName}\nАрхитектура: {NativeArch}",
             "translatorComment": "Copied from source.",
             "placeholders": [
                 {
@@ -640,20 +646,28 @@
                     "expr": "strings.TrimPrefix(runtime.Version(), \"go\")"
                 },
                 {
-                    "id": "OsName",
+                    "id": "GOARCH",
                     "string": "%[4]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 4,
-                    "expr": "version.OsName()"
+                    "expr": "runtime.GOARCH"
                 },
                 {
-                    "id": "GOARCH",
+                    "id": "OsName",
                     "string": "%[5]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 5,
-                    "expr": "runtime.GOARCH"
+                    "expr": "version.OsName()"
+                },
+                {
+                    "id": "NativeArch",
+                    "string": "%[6]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 6,
+                    "expr": "version.NativeArch()"
                 }
             ]
         },
@@ -718,6 +732,12 @@
             "translatorComment": "Copied from source."
         },
         {
+            "id": "Scripts:",
+            "message": "Scripts:",
+            "translation": "Скрипты:",
+            "translatorComment": "Copied from source."
+        },
+        {
             "id": "Preshared key:",
             "message": "Preshared key:",
             "translation": "Общий ключ:",
@@ -751,6 +771,36 @@
             "id": "Transfer:",
             "message": "Transfer:",
             "translation": "Передача:",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "pre-up",
+            "message": "pre-up",
+            "translation": "перед подключением",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "post-up",
+            "message": "post-up",
+            "translation": "после подключения",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "pre-down",
+            "message": "pre-down",
+            "translation": "перед отключением",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "post-down",
+            "message": "post-down",
+            "translation": "после отключения",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "disabled, per policy",
+            "message": "disabled, per policy",
+            "translation": "отключено, по политике",
             "translatorComment": "Copied from source."
         },
         {
@@ -838,7 +888,7 @@
         {
             "id": "&Name:",
             "message": "&Name:",
-            "translation": "&Имя:",
+            "translation": "&Название:",
             "translatorComment": "Copied from source."
         },
         {
@@ -856,13 +906,13 @@
         {
             "id": "&Block untunneled traffic (kill-switch)",
             "message": "&Block untunneled traffic (kill-switch)",
-            "translation": "&Блокировать нетуннельный трафик",
+            "translation": "&Блокировать нетуннелированный трафик",
             "translatorComment": "Copied from source."
         },
         {
-            "id": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface, with special exceptions for DHCP and NDP.",
-            "message": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface, with special exceptions for DHCP and NDP.",
-            "translation": "Когда конфигурация имеет ровно одного пира, и у этого пира есть разрешенные IP, содержащие хотя бы один из 0.0.0.0/0 или ::/0, то служба туннеля обязывает брандмауэр блокировать весь входящий и исходящий трафик, который не проходит через туннель, за исключением DHCP и NDP.",
+            "id": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface or is to the wrong DNS server, with special exceptions for DHCP and NDP.",
+            "message": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface or is to the wrong DNS server, with special exceptions for DHCP and NDP.",
+            "translation": "Если конфигурация имеет ровно один пир, а этот пир имеет разрешенные IP, содержащие хотя бы один из 0.0.0.0/0 или ::/0, то туннельный сервис использует набор правил брандмауэра для блокирования всего трафика, который не проходит через туннель или к неверным DNS-серверам, за исключением DHCP и NDP.",
             "translatorComment": "Copied from source."
         },
         {
@@ -886,19 +936,19 @@
         {
             "id": "Invalid name",
             "message": "Invalid name",
-            "translation": "Недопустимое имя",
+            "translation": "Некорректное название",
             "translatorComment": "Copied from source."
         },
         {
             "id": "A name is required.",
             "message": "A name is required.",
-            "translation": "Требуется имя.",
+            "translation": "Необходимо название.",
             "translatorComment": "Copied from source."
         },
         {
             "id": "Tunnel name ‘{NewName}’ is invalid.",
             "message": "Tunnel name ‘{NewName}’ is invalid.",
-            "translation": "Имя туннеля ‘{NewName}’ недопустимо.",
+            "translation": "Название туннеля ‘{NewName}’ недопустимо.",
             "translatorComment": "Copied from source.",
             "placeholders": [
                 {
@@ -1006,13 +1056,13 @@
         {
             "id": "&Copy",
             "message": "&Copy",
-            "translation": "&Копировать",
+            "translation": "&Скопировать",
             "translatorComment": "Copied from source."
         },
         {
             "id": "Select &all",
             "message": "Select &all",
-            "translation": "Выбрать &всё",
+            "translation": "Выбрать &все",
             "translatorComment": "Copied from source."
         },
         {
@@ -1030,7 +1080,7 @@
         {
             "id": "Log message",
             "message": "Log message",
-            "translation": "Сообщение Журнала",
+            "translation": "Сообщение журнала",
             "translatorComment": "Copied from source."
         },
         {
@@ -1042,7 +1092,7 @@
         {
             "id": "Export log to file",
             "message": "Export log to file",
-            "translation": "Экспорт Журнала в файл",
+            "translation": "Экспорт журнала в файл",
             "translatorComment": "Copied from source."
         },
         {
@@ -1148,58 +1198,10 @@
             "translatorComment": "Copied from source."
         },
         {
-            "id": "WireGuard Tunnel Error",
-            "message": "WireGuard Tunnel Error",
-            "translation": "Ошибка туннеля WireGuard",
+            "id": "&Tunnels",
+            "message": "&Tunnels",
+            "translation": "&Туннели",
             "translatorComment": "Copied from source."
-        },
-        {
-            "id": "WireGuard: {TextForStateglobalState_true}",
-            "message": "WireGuard: {TextForStateglobalState_true}",
-            "translation": "WireGuard: {TextForStateglobalState_true}",
-            "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "TextForStateglobalState_true",
-                    "string": "%[1]s",
-                    "type": "string",
-                    "underlyingType": "string",
-                    "argNum": 1,
-                    "expr": "textForState(globalState, true)"
-                }
-            ]
-        },
-        {
-            "id": "Status: {StateText}",
-            "message": "Status: {StateText}",
-            "translation": "Статус: {StateText}",
-            "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "StateText",
-                    "string": "%[1]s",
-                    "type": "string",
-                    "underlyingType": "string",
-                    "argNum": 1,
-                    "expr": "stateText"
-                }
-            ]
-        },
-        {
-            "id": "Addresses: {String}",
-            "message": "Addresses: {String}",
-            "translation": "Адреса: {String}",
-            "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "String",
-                    "string": "%[1]s",
-                    "type": "string",
-                    "underlyingType": "string",
-                    "argNum": 1,
-                    "expr": "sb.String()"
-                }
-            ]
         },
         {
             "id": "WireGuard Activated",
@@ -1242,6 +1244,60 @@
                     "underlyingType": "string",
                     "argNum": 1,
                     "expr": "tunnel.Name"
+                }
+            ]
+        },
+        {
+            "id": "WireGuard Tunnel Error",
+            "message": "WireGuard Tunnel Error",
+            "translation": "Ошибка туннеля WireGuard",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "WireGuard: {TextForStateglobalState_true}",
+            "message": "WireGuard: {TextForStateglobalState_true}",
+            "translation": "WireGuard: {TextForStateglobalState_true}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "TextForStateglobalState_true",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "textForState(globalState, true)"
+                }
+            ]
+        },
+        {
+            "id": "Status: {StateText}",
+            "message": "Status: {StateText}",
+            "translation": "Статус: {StateText}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "StateText",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "stateText"
+                }
+            ]
+        },
+        {
+            "id": "Addresses: {EnumerationSeparator}",
+            "message": "Addresses: {EnumerationSeparator}",
+            "translation": "Адреса: {EnumerationSeparator}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "EnumerationSeparator",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "strings.Join(addrs, l18n.EnumerationSeparator())"
                 }
             ]
         },
@@ -1321,6 +1377,12 @@
             "id": "&Remove selected tunnel(s)",
             "message": "&Remove selected tunnel(s)",
             "translation": "&Удалить выбранные туннели",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "no configuration files were found",
+            "message": "no configuration files were found",
+            "translation": "файлы конфигурации не были найдены",
             "translatorComment": "Copied from source."
         },
         {
@@ -1736,7 +1798,7 @@
         {
             "id": "Status: Waiting for updater service",
             "message": "Status: Waiting for updater service",
-            "translation": "Статус: Обновление",
+            "translation": "Статус: Ожидание обновления",
             "translatorComment": "Copied from source."
         },
         {

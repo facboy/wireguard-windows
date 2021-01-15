@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
  */
 
 package main
@@ -22,7 +22,7 @@ import (
 
 //export WireGuardTunnelService
 func WireGuardTunnelService(confFile16 *uint16) bool {
-	confFile := windows.UTF16ToString((*[(1 << 30) - 1]uint16)(unsafe.Pointer(confFile16))[:])
+	confFile := windows.UTF16PtrToString(confFile16)
 	conf.PresetRootDirectory(filepath.Dir(confFile))
 	tunnel.UseFixedGUIDInsteadOfDeterministic = true
 	err := tunnel.Run(confFile)

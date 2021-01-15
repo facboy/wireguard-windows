@@ -1,51 +1,89 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
  */
 
 package conf
 
 import (
+	"errors"
+	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
+	"sync"
+	"time"
 
 	"golang.org/x/sys/windows"
 )
 
-func maybeMigrate(c string) {
-	if disableAutoMigration {
-		return
-	}
+var migrating sync.Mutex
+var lastMigrationTimer *time.Timer
 
-	vol := filepath.VolumeName(c)
-	withoutVol := strings.TrimPrefix(c, vol)
-	oldRoot := filepath.Join(vol, "\\windows.old")
-	oldC := filepath.Join(oldRoot, withoutVol)
+func MigrateUnencryptedConfigs() { migrateUnencryptedConfigs(3) }
 
-	sd, err := windows.GetNamedSecurityInfo(oldRoot, windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
-	if err == windows.ERROR_PATH_NOT_FOUND || err == windows.ERROR_FILE_NOT_FOUND {
-		return
-	}
+func migrateUnencryptedConfigs(sharingBase int) {
+	migrating.Lock()
+	defer migrating.Unlock()
+	configFileDir, err := tunnelConfigurationsDirectory()
 	if err != nil {
-		log.Printf("Not migrating configuration from ‘%s’ due to GetNamedSecurityInfo error: %v", oldRoot, err)
 		return
 	}
-	owner, defaulted, err := sd.Owner()
+	files, err := ioutil.ReadDir(configFileDir)
 	if err != nil {
-		log.Printf("Not migrating configuration from ‘%s’ due to GetSecurityDescriptorOwner error: %v", oldRoot, err)
 		return
 	}
-	if defaulted || (!owner.IsWellKnown(windows.WinLocalSystemSid) && !owner.IsWellKnown(windows.WinBuiltinAdministratorsSid)) {
-		log.Printf("Not migrating configuration from ‘%s’, as it is not explicitly owned by SYSTEM or Built-in Administrators, but rather ‘%v’", oldRoot, owner)
-		return
-	}
-	err = windows.MoveFileEx(windows.StringToUTF16Ptr(oldC), windows.StringToUTF16Ptr(c), windows.MOVEFILE_COPY_ALLOWED)
-	if err != nil {
-		if err != windows.ERROR_FILE_NOT_FOUND && err != windows.ERROR_ALREADY_EXISTS {
-			log.Printf("Not migrating configuration from ‘%s’ due to error when moving files: %v", oldRoot, err)
+	ignoreSharingViolations := false
+	for _, file := range files {
+		path := filepath.Join(configFileDir, file.Name())
+		name := filepath.Base(file.Name())
+		if len(name) <= len(configFileUnencryptedSuffix) || !strings.HasSuffix(name, configFileUnencryptedSuffix) {
+			continue
 		}
-		return
+		if !file.Mode().IsRegular() || file.Mode().Perm()&0444 == 0 {
+			continue
+		}
+
+		var bytes []byte
+		var config *Config
+		// We don't use ioutil's ReadFile, because we actually want RDWR, so that we can take advantage
+		// of Windows file locking for ensuring the file is finished being written.
+		f, err := os.OpenFile(path, os.O_RDWR, 0)
+		if err != nil {
+			if errors.Is(err, windows.ERROR_SHARING_VIOLATION) {
+				if ignoreSharingViolations {
+					continue
+				} else if sharingBase > 0 {
+					if lastMigrationTimer != nil {
+						lastMigrationTimer.Stop()
+					}
+					lastMigrationTimer = time.AfterFunc(time.Second/time.Duration(sharingBase*sharingBase), func() { migrateUnencryptedConfigs(sharingBase - 1) })
+					ignoreSharingViolations = true
+					continue
+				}
+			}
+			goto error
+		}
+		bytes, err = ioutil.ReadAll(f)
+		f.Close()
+		if err != nil {
+			goto error
+		}
+		config, err = FromWgQuickWithUnknownEncoding(string(bytes), strings.TrimSuffix(name, configFileUnencryptedSuffix))
+		if err != nil {
+			goto error
+		}
+		err = config.Save(false)
+		if err != nil {
+			goto error
+		}
+		err = os.Remove(path)
+		if err != nil {
+			log.Printf("Unable to remove old path %#q: %v", path, err)
+		}
+		continue
+	error:
+		log.Printf("Unable to ingest and encrypt %#q: %v", path, err)
 	}
-	log.Printf("Migrated configuration from ‘%s’", oldRoot)
 }

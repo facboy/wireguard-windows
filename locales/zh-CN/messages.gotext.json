@@ -60,9 +60,9 @@
             ]
         },
         {
-            "id": "You must use the 64-bit version of WireGuard on this computer.",
-            "message": "You must use the 64-bit version of WireGuard on this computer.",
-            "translation": "您必须在此计算机上使用64位版本的 WireGuard。",
+            "id": "You must use the native version of WireGuard on this computer.",
+            "message": "You must use the native version of WireGuard on this computer.",
+            "translation": "您必须在此计算机上使用原生版本的 WireGuard。",
             "translatorComment": "Copied from source."
         },
         {
@@ -571,9 +571,9 @@
             "translatorComment": "Copied from source."
         },
         {
-            "id": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}\nOperating system: {OsName}\nArchitecture: {GOARCH}",
-            "message": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}\nOperating system: {OsName}\nArchitecture: {GOARCH}",
-            "translation": "应用版本： {Number}\nGo 后端版本： {WireGuardGoVersion}\nGo 版本： {Version_go}\n操作系统： {OsName}\n架构： {GOARCH}",
+            "id": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}-{GOARCH}\nOperating system: {OsName}\nArchitecture: {NativeArch}",
+            "message": "App version: {Number}\nGo backend version: {WireGuardGoVersion}\nGo version: {Version_go}-{GOARCH}\nOperating system: {OsName}\nArchitecture: {NativeArch}",
+            "translation": "应用版本: {Number}\nGo 后端版本: {WireGuardGoVersion}\nGo 语言版本: {Version_go}-{GOARCH}\n操作系统: {OsName}\n架构: {NativeArch}",
             "translatorComment": "Copied from source.",
             "placeholders": [
                 {
@@ -601,20 +601,28 @@
                     "expr": "strings.TrimPrefix(runtime.Version(), \"go\")"
                 },
                 {
-                    "id": "OsName",
+                    "id": "GOARCH",
                     "string": "%[4]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 4,
-                    "expr": "version.OsName()"
+                    "expr": "runtime.GOARCH"
                 },
                 {
-                    "id": "GOARCH",
+                    "id": "OsName",
                     "string": "%[5]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 5,
-                    "expr": "runtime.GOARCH"
+                    "expr": "version.OsName()"
+                },
+                {
+                    "id": "NativeArch",
+                    "string": "%[6]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 6,
+                    "expr": "version.NativeArch()"
                 }
             ]
         },
@@ -679,6 +687,12 @@
             "translatorComment": "Copied from source."
         },
         {
+            "id": "Scripts:",
+            "message": "Scripts:",
+            "translation": "脚本:",
+            "translatorComment": "Copied from source."
+        },
+        {
             "id": "Preshared key:",
             "message": "Preshared key:",
             "translation": "预共享密钥:",
@@ -712,6 +726,36 @@
             "id": "Transfer:",
             "message": "Transfer:",
             "translation": "流量:",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "pre-up",
+            "message": "pre-up",
+            "translation": "连接前",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "post-up",
+            "message": "post-up",
+            "translation": "连接后",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "pre-down",
+            "message": "pre-down",
+            "translation": "断开前",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "post-down",
+            "message": "post-down",
+            "translation": "断开后",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "disabled, per policy",
+            "message": "disabled, per policy",
+            "translation": "已禁用（依管理策略）",
             "translatorComment": "Copied from source."
         },
         {
@@ -821,9 +865,9 @@
             "translatorComment": "Copied from source."
         },
         {
-            "id": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface, with special exceptions for DHCP and NDP.",
-            "message": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface, with special exceptions for DHCP and NDP.",
-            "translation": "只有一个节点，且该节点允许的 IP 中包含 0.0.0.0/0 或 ::/0 时，使用防火墙规则拦截所有未通过隧道的流量 (DHCP 和 NDP 流量除外)。",
+            "id": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface or is to the wrong DNS server, with special exceptions for DHCP and NDP.",
+            "message": "When a configuration has exactly one peer, and that peer has an allowed IPs containing at least one of 0.0.0.0/0 or ::/0, then the tunnel service engages a firewall ruleset to block all traffic that is neither to nor from the tunnel interface or is to the wrong DNS server, with special exceptions for DHCP and NDP.",
+            "translation": "只有一个节点，且该节点允许的 IP 中包含 0.0.0.0/0 或 ::/0 时，使用防火墙规则拦截所有未通过隧道，或是发往错误的 DNS 服务器的流量。DHCP 和 NDP 流量不受影响。",
             "translatorComment": "Copied from source."
         },
         {
@@ -1109,58 +1153,10 @@
             "translatorComment": "Copied from source."
         },
         {
-            "id": "WireGuard Tunnel Error",
-            "message": "WireGuard Tunnel Error",
-            "translation": "WireGuard 隧道错误",
+            "id": "&Tunnels",
+            "message": "&Tunnels",
+            "translation": "隧道 (&T)",
             "translatorComment": "Copied from source."
-        },
-        {
-            "id": "WireGuard: {TextForStateglobalState_true}",
-            "message": "WireGuard: {TextForStateglobalState_true}",
-            "translation": "WireGuard: {TextForStateglobalState_true}",
-            "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "TextForStateglobalState_true",
-                    "string": "%[1]s",
-                    "type": "string",
-                    "underlyingType": "string",
-                    "argNum": 1,
-                    "expr": "textForState(globalState, true)"
-                }
-            ]
-        },
-        {
-            "id": "Status: {StateText}",
-            "message": "Status: {StateText}",
-            "translation": "状态: {StateText}",
-            "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "StateText",
-                    "string": "%[1]s",
-                    "type": "string",
-                    "underlyingType": "string",
-                    "argNum": 1,
-                    "expr": "stateText"
-                }
-            ]
-        },
-        {
-            "id": "Addresses: {String}",
-            "message": "Addresses: {String}",
-            "translation": "地址: {String}",
-            "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "String",
-                    "string": "%[1]s",
-                    "type": "string",
-                    "underlyingType": "string",
-                    "argNum": 1,
-                    "expr": "sb.String()"
-                }
-            ]
         },
         {
             "id": "WireGuard Activated",
@@ -1203,6 +1199,60 @@
                     "underlyingType": "string",
                     "argNum": 1,
                     "expr": "tunnel.Name"
+                }
+            ]
+        },
+        {
+            "id": "WireGuard Tunnel Error",
+            "message": "WireGuard Tunnel Error",
+            "translation": "WireGuard 隧道错误",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "WireGuard: {TextForStateglobalState_true}",
+            "message": "WireGuard: {TextForStateglobalState_true}",
+            "translation": "WireGuard: {TextForStateglobalState_true}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "TextForStateglobalState_true",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "textForState(globalState, true)"
+                }
+            ]
+        },
+        {
+            "id": "Status: {StateText}",
+            "message": "Status: {StateText}",
+            "translation": "状态: {StateText}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "StateText",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "stateText"
+                }
+            ]
+        },
+        {
+            "id": "Addresses: {EnumerationSeparator}",
+            "message": "Addresses: {EnumerationSeparator}",
+            "translation": "地址: {EnumerationSeparator}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "EnumerationSeparator",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "strings.Join(addrs, l18n.EnumerationSeparator())"
                 }
             ]
         },
@@ -1282,6 +1332,12 @@
             "id": "&Remove selected tunnel(s)",
             "message": "&Remove selected tunnel(s)",
             "translation": "删除所选隧道 (&R)",
+            "translatorComment": "Copied from source."
+        },
+        {
+            "id": "no configuration files were found",
+            "message": "no configuration files were found",
+            "translation": "未找到配置文件",
             "translatorComment": "Copied from source."
         },
         {
