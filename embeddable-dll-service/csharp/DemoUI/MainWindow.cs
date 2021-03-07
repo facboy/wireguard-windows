@@ -12,12 +12,13 @@ using System.Threading;
 using System.IO.Pipes;
 using System.Diagnostics;
 using System.Net.Sockets;
+using System.Security.AccessControl;
 
 namespace DemoUI
 {
     public partial class MainWindow : Form
     {
-        private static readonly string userDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+        private static readonly string userDirectory = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "Config"); //TODO: put in Program Files in real code.
         private static readonly string configFile = Path.Combine(userDirectory, "demobox.conf");
         private static readonly string logFile = Path.Combine(userDirectory, "log.bin");
 
@@ -28,13 +29,20 @@ namespace DemoUI
 
         public MainWindow()
         {
+            makeConfigDirectory();
             InitializeComponent();
             Application.ApplicationExit += Application_ApplicationExit;
-
             try { File.Delete(logFile); } catch { }
             log = new Tunnel.Ringlogger(logFile, "GUI");
             logPrintingThread = new Thread(new ThreadStart(tailLog));
             transferUpdateThread = new Thread(new ThreadStart(tailTransfer));
+        }
+
+        private void makeConfigDirectory()
+        {
+            var ds = new DirectorySecurity();
+            ds.SetSecurityDescriptorSddlForm("O:BAG:BAD:PAI(A;OICI;FA;;;BA)(A;OICI;FA;;;SY)");
+            FileSystemAclExtensions.CreateDirectory(ds, userDirectory);
         }
 
         private void tailLog()
@@ -58,24 +66,25 @@ namespace DemoUI
 
         private void tailTransfer()
         {
+            StreamReader reader = null;
             NamedPipeClientStream stream = null;
+            while (threadsRunning)
+            {
+                try
+                {
+                    stream = Tunnel.Service.GetPipe(configFile);
+                    stream.Connect();
+                    reader = new StreamReader(stream);
+                    break;
+                }
+                catch { }
+                Thread.Sleep(1000);
+            }
+
             try
             {
                 while (threadsRunning)
                 {
-                    while (threadsRunning)
-                    {
-                        try
-                        {
-                            stream = Tunnel.Service.GetPipe(configFile);
-                            stream.Connect();
-                            break;
-                        }
-                        catch { }
-                        Thread.Sleep(1000);
-                    }
-
-                    var reader = new StreamReader(stream);
                     stream.Write(Encoding.UTF8.GetBytes("get=1\n\n"));
                     ulong rx = 0, tx = 0;
                     while (threadsRunning)
@@ -92,14 +101,13 @@ namespace DemoUI
                             tx += ulong.Parse(line.Substring(9));
                     }
                     Invoke(new Action<ulong, ulong>(updateTransferTitle), new object[] { rx, tx });
-                    stream.Close();
                     Thread.Sleep(1000);
                 }
             }
             catch { }
             finally
             {
-                if (stream != null && stream.IsConnected)
+                if (stream.IsConnected)
                     stream.Close();
             }
         }

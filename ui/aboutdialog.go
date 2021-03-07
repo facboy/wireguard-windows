@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package ui
@@ -12,7 +12,7 @@ import (
 	"github.com/lxn/walk"
 	"github.com/lxn/win"
 	"golang.org/x/sys/windows"
-	"golang.zx2c4.com/wireguard/device"
+
 	"golang.zx2c4.com/wireguard/windows/l18n"
 	"golang.zx2c4.com/wireguard/windows/version"
 )
@@ -95,7 +95,7 @@ func runAboutDialog(owner walk.Form) error {
 		return err
 	}
 	detailsLbl.SetTextAlignment(walk.AlignHCenterVNear)
-	detailsLbl.SetText(l18n.Sprintf("App version: %s\nGo backend version: %s\nGo version: %s-%s\nOperating system: %s\nArchitecture: %s", version.Number, device.WireGuardGoVersion, strings.TrimPrefix(runtime.Version(), "go"), runtime.GOARCH, version.OsName(), version.NativeArch()))
+	detailsLbl.SetText(l18n.Sprintf("App version: %s\nGo backend version: %s\nGo version: %s-%s\nOperating system: %s\nArchitecture: %s", version.Number, version.ProtoImplementation(), strings.TrimPrefix(runtime.Version(), "go"), runtime.GOARCH, version.OsName(), version.Arch()))
 
 	copyrightLbl, err := walk.NewTextLabel(showingAboutDialog)
 	if err != nil {
@@ -104,7 +104,7 @@ func runAboutDialog(owner walk.Form) error {
 	copyrightFont, _ := walk.NewFont("Segoe UI", 7, 0)
 	copyrightLbl.SetFont(copyrightFont)
 	copyrightLbl.SetTextAlignment(walk.AlignHCenterVNear)
-	copyrightLbl.SetText("Copyright © 2015-2020 Jason A. Donenfeld. All Rights Reserved.")
+	copyrightLbl.SetText("Copyright © 2015-2021 Jason A. Donenfeld. All Rights Reserved.")
 
 	buttonCP, err := walk.NewComposite(showingAboutDialog)
 	if err != nil {

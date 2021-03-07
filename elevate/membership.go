@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package elevate
@@ -37,12 +37,12 @@ func TokenIsElevatedOrElevatable(token windows.Token) bool {
 }
 
 func IsAdminDesktop() (bool, error) {
-	hwnd := getShellWindow()
+	hwnd := windows.GetShellWindow()
 	if hwnd == 0 {
 		return false, windows.ERROR_INVALID_WINDOW_HANDLE
 	}
 	var pid uint32
-	_, err := getWindowThreadProcessId(hwnd, &pid)
+	_, err := windows.GetWindowThreadProcessId(hwnd, &pid)
 	if err != nil {
 		return false, err
 	}

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package ringlogger
@@ -27,7 +27,7 @@ func DumpTo(out io.Writer, notSystem bool) error {
 	}
 	defer file.Close()
 	mapping, err := windows.CreateFileMapping(windows.Handle(file.Fd()), nil, windows.PAGE_READONLY, 0, 0, nil)
-	if err != nil {
+	if err != nil && err != windows.ERROR_ALREADY_EXISTS {
 		return err
 	}
 	rl, err := newRingloggerFromMappingHandle(mapping, "DMP", windows.FILE_MAP_READ)

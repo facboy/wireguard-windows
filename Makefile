@@ -25,16 +25,13 @@ define download =
 	if ! mv $$@.unverified $$@; then rm -f $$@.unverified; exit 1; fi
 endef
 
-$(eval $(call download,go.tar.gz,https://golang.org/dl/go1.16beta1.linux-amd64.tar.gz,3931a0d493d411d6c697df6f15d5292fdd8031fde7014fded399effdad4c12d8))
-$(eval $(call download,wintun.zip,https://www.wintun.net/builds/wintun-0.10.zip,45bbe63a7cc60e5b6123b8d06747ba703ab3fd636298a50953db10da1d70f5b6))
+$(eval $(call download,go.tar.zst,https://download.wireguard.com/windows-toolchain/distfiles/go1.16-linux_amd64_2021-02-28.tar.zst,21ed8f6cf874c4ed9469e876bbd70813d0371bf851f18c84cb6091c72e9a29cb))
+$(eval $(call download,wintun.zip,https://www.wintun.net/builds/wintun-0.10.2.zip,fcd9f62f1bd5a550fcb9c21fbb5d6a556214753ccbbd1a3ebad4d318ec9dcbef))
 
-.deps/go/prepared: .distfiles/go.tar.gz $(wildcard go-patches/*.patch)
+.deps/go/prepared: .distfiles/go.tar.zst
 	mkdir -p .deps
 	rm -rf .deps/go
-	tar -C .deps -xzf .distfiles/go.tar.gz
-	chmod -R +w .deps/go
-	cat $(filter %.patch,$^) | patch -f -N -r- -p1 -d .deps/go
-	cd .deps/go/src && GOARCH=amd64 GOOS=linux go build -v -o ../pkg/tool/linux_amd64/link cmd/link
+	bsdtar -C .deps -xf .distfiles/go.tar.zst
 	touch $@
 
 .deps/wintun/prepared: .distfiles/wintun.zip
@@ -55,6 +52,9 @@ resources_386.syso: $(RESOURCE_FILES)
 resources_arm.syso: $(RESOURCE_FILES)
 	armv7-w64-mingw32-windres $(RCFLAGS) -I .deps/wintun/bin/arm -i $< -o $@
 
+resources_arm64.syso: $(RESOURCE_FILES)
+	aarch64-w64-mingw32-windres $(RCFLAGS) -I .deps/wintun/bin/arm64 -i $< -o $@
+
 amd64/wireguard.exe: export GOARCH := amd64
 amd64/wireguard.exe: resources_amd64.syso $(SOURCE_FILES)
 	go build $(GOFLAGS) -o $@
@@ -68,9 +68,9 @@ arm/wireguard.exe: export GOARM := 7
 arm/wireguard.exe: resources_arm.syso $(SOURCE_FILES)
 	go build $(GOFLAGS) -o $@
 
-arm64/wireguard.exe: arm/wireguard.exe
-	mkdir -p $(@D)
-	cp $< $@
+arm64/wireguard.exe: export GOARCH := arm64
+arm64/wireguard.exe: resources_arm64.syso $(SOURCE_FILES)
+	go build $(GOFLAGS) -o $@
 
 remaster: export GOARCH := amd64
 remaster: export GOPROXY := direct

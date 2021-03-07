@@ -1,13 +1,15 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package conf
 
 import (
+	"bufio"
 	"encoding/base64"
 	"encoding/hex"
+	"io"
 	"net"
 	"strconv"
 	"strings"
@@ -367,8 +369,7 @@ func FromWgQuickWithUnknownEncoding(s string, name string) (*Config, error) {
 	return nil, firstErr
 }
 
-func FromUAPI(s string, existingConfig *Config) (*Config, error) {
-	lines := strings.Split(s, "\n")
+func FromUAPI(reader io.Reader, existingConfig *Config) (*Config, error) {
 	parserState := inInterfaceSection
 	conf := Config{
 		Name: existingConfig.Name,
@@ -377,12 +378,22 @@ func FromUAPI(s string, existingConfig *Config) (*Config, error) {
 			DNS:       existingConfig.Interface.DNS,
 			DNSSearch: existingConfig.Interface.DNSSearch,
 			MTU:       existingConfig.Interface.MTU,
+			PreUp:     existingConfig.Interface.PreUp,
+			PostUp:    existingConfig.Interface.PostUp,
+			PreDown:   existingConfig.Interface.PreDown,
+			PostDown:  existingConfig.Interface.PostDown,
 		},
 	}
 	var peer *Peer
-	for _, line := range lines {
+	lineReader := bufio.NewReader(reader)
+	for {
+		line, err := lineReader.ReadString('\n')
+		if err != nil {
+			return nil, err
+		}
+		line = line[:len(line)-1]
 		if len(line) == 0 {
-			continue
+			break
 		}
 		equals := strings.IndexByte(line, '=')
 		if equals < 0 {

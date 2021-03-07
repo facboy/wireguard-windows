@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package conf
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -30,7 +30,7 @@ func migrateUnencryptedConfigs(sharingBase int) {
 	if err != nil {
 		return
 	}
-	files, err := ioutil.ReadDir(configFileDir)
+	files, err := os.ReadDir(configFileDir)
 	if err != nil {
 		return
 	}
@@ -41,13 +41,20 @@ func migrateUnencryptedConfigs(sharingBase int) {
 		if len(name) <= len(configFileUnencryptedSuffix) || !strings.HasSuffix(name, configFileUnencryptedSuffix) {
 			continue
 		}
-		if !file.Mode().IsRegular() || file.Mode().Perm()&0444 == 0 {
+		if !file.Type().IsRegular() {
+			continue
+		}
+		info, err := file.Info()
+		if err != nil {
+			continue
+		}
+		if info.Mode().Perm()&0444 == 0 {
 			continue
 		}
 
 		var bytes []byte
 		var config *Config
-		// We don't use ioutil's ReadFile, because we actually want RDWR, so that we can take advantage
+		// We don't use os.ReadFile, because we actually want RDWR, so that we can take advantage
 		// of Windows file locking for ensuring the file is finished being written.
 		f, err := os.OpenFile(path, os.O_RDWR, 0)
 		if err != nil {
@@ -65,7 +72,7 @@ func migrateUnencryptedConfigs(sharingBase int) {
 			}
 			goto error
 		}
-		bytes, err = ioutil.ReadAll(f)
+		bytes, err = io.ReadAll(f)
 		f.Close()
 		if err != nil {
 			goto error

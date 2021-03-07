@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package tunnel
@@ -12,12 +12,12 @@ import (
 	"net"
 	"os"
 	"runtime"
-	"runtime/debug"
-	"strings"
 	"time"
 
+	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/mgr"
+	"golang.zx2c4.com/wireguard/conn"
 	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/ipc"
 	"golang.zx2c4.com/wireguard/tun"
@@ -108,16 +108,6 @@ func (service *tunnelService) Execute(args []string, r <-chan svc.ChangeRequest,
 		serviceError = services.ErrorRingloggerOpen
 		return
 	}
-	defer func() {
-		if x := recover(); x != nil {
-			for _, line := range append([]string{fmt.Sprint(x)}, strings.Split(string(debug.Stack()), "\n")...) {
-				if len(strings.TrimSpace(line)) > 0 {
-					log.Println(line)
-				}
-			}
-			panic(x)
-		}
-	}()
 
 	config, err = conf.LoadFromPath(service.Path)
 	if err != nil {
@@ -131,8 +121,7 @@ func (service *tunnelService) Execute(args []string, r <-chan svc.ChangeRequest,
 		return
 	}
 
-	logPrefix := fmt.Sprintf("[%s] ", config.Name)
-	log.SetPrefix(logPrefix)
+	log.SetPrefix(fmt.Sprintf("[%s] ", config.Name))
 
 	log.Println("Starting", version.UserAgent())
 
@@ -164,7 +153,17 @@ func (service *tunnelService) Execute(args []string, r <-chan svc.ChangeRequest,
 	}
 
 	log.Println("Creating Wintun interface")
-	wintun, err := tun.CreateTUNWithRequestedGUID(config.Name, deterministicGUID(config), 0)
+	var wintun tun.Device
+	for i := 0; i < 5; i++ {
+		if i > 0 {
+			time.Sleep(time.Second)
+			log.Printf("Retrying Wintun creation after failure because system just booted (T+%v): %v", windows.DurationSinceBoot(), err)
+		}
+		wintun, err = tun.CreateTUNWithRequestedGUID(config.Name, deterministicGUID(config), 0)
+		if err == nil || windows.DurationSinceBoot() > time.Minute*4 {
+			break
+		}
+	}
 	if err != nil {
 		serviceError = services.ErrorCreateWintun
 		return
@@ -197,9 +196,8 @@ func (service *tunnelService) Execute(args []string, r <-chan svc.ChangeRequest,
 	}
 
 	log.Println("Creating interface instance")
-	logOutput := log.New(ringlogger.Global, logPrefix, 0)
-	logger := &device.Logger{logOutput, logOutput, logOutput}
-	dev = device.NewDevice(wintun, logger)
+	bind := conn.NewDefaultBind()
+	dev = device.NewDevice(wintun, bind, &device.Logger{log.Printf, log.Printf})
 
 	log.Println("Setting interface configuration")
 	uapi, err = ipc.UAPIListen(config.Name)
@@ -216,7 +214,7 @@ func (service *tunnelService) Execute(args []string, r <-chan svc.ChangeRequest,
 	log.Println("Bringing peers up")
 	dev.Up()
 
-	watcher.Configure(dev, config, nativeTun)
+	watcher.Configure(bind.(conn.BindSocketToInterface), config, nativeTun)
 
 	log.Println("Listening for UAPI requests")
 	go func() {

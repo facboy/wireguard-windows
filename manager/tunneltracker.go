@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package manager
@@ -273,4 +273,5 @@ func trackTunnelService(tunnelName string, service *mgr.Service) {
 		IPCServerNotifyTunnelChange(tunnelName, TunnelStopped, fmt.Errorf("Unable to continue monitoring service, so stopping: %w", err))
 		service.Control(svc.Stop)
 	}
+	disconnectTunnelServicePipe(tunnelName)
 }

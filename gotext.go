@@ -3,14 +3,13 @@
 
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,7 +19,7 @@ import (
 )
 
 func main() {
-	langDirs, err := ioutil.ReadDir("locales")
+	langDirs, err := os.ReadDir("locales")
 	if err != nil {
 		panic(err)
 	}
@@ -30,7 +29,7 @@ func main() {
 			continue
 		}
 		lang := dir.Name()
-		if jsonData, err := ioutil.ReadFile(filepath.Join("locales", lang, "messages.gotext.json")); err == nil {
+		if jsonData, err := os.ReadFile(filepath.Join("locales", lang, "messages.gotext.json")); err == nil {
 			var translations pipeline.Messages
 			if err := json.Unmarshal(jsonData, &translations); err != nil {
 				panic(err)
@@ -50,7 +49,7 @@ func main() {
 	if len(langs) == 0 {
 		panic("no locales found")
 	}
-	gotext, err := ioutil.TempFile("", "gotext*.exe")
+	gotext, err := os.CreateTemp("", "gotext*.exe")
 	if err != nil {
 		panic(err)
 	}

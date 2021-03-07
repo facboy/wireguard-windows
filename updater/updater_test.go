@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package updater
@@ -20,7 +20,7 @@ func TestUpdate(t *testing.T) {
 		return
 	}
 	t.Log("Found update")
-	progress := DownloadVerifyAndExecute(0, nil)
+	progress := DownloadVerifyAndExecute(0)
 	for {
 		dp := <-progress
 		if dp.Error != nil {

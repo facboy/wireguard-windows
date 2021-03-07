@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package ringlogger
@@ -58,7 +58,7 @@ func NewRinglogger(filename string, tag string) (*Ringlogger, error) {
 		return nil, err
 	}
 	mapping, err := windows.CreateFileMapping(windows.Handle(file.Fd()), nil, windows.PAGE_READWRITE, 0, 0, nil)
-	if err != nil {
+	if err != nil && err != windows.ERROR_ALREADY_EXISTS {
 		return nil, err
 	}
 	rl, err := newRingloggerFromMappingHandle(mapping, tag, windows.FILE_MAP_WRITE)
@@ -136,6 +136,7 @@ func (rl *Ringlogger) Write(p []byte) (n int, err error) {
 	textLen := 3 + len(p) + len(rl.tag)
 	if textLen > maxLogLineLength-1 {
 		p = p[:maxLogLineLength-1-3-len(rl.tag)]
+		textLen = maxLogLineLength-1
 	}
 	line.line[textLen] = 0
 	line.line[0] = 0 // Null out the beginning and only let it extend after the other writes have completed
@@ -234,17 +235,16 @@ func (rl *Ringlogger) Close() error {
 	return nil
 }
 
-func (rl *Ringlogger) ExportInheritableMappingHandleStr() (str string, handleToClose windows.Handle, err error) {
+func (rl *Ringlogger) ExportInheritableMappingHandle() (handleToClose windows.Handle, err error) {
 	handleToClose, err = windows.CreateFileMapping(windows.Handle(rl.file.Fd()), nil, windows.PAGE_READONLY, 0, 0, nil)
-	if err != nil {
+	if err != nil && err != windows.ERROR_ALREADY_EXISTS {
 		return
 	}
 	err = windows.SetHandleInformation(handleToClose, windows.HANDLE_FLAG_INHERIT, windows.HANDLE_FLAG_INHERIT)
 	if err != nil {
-		windows.Close(handleToClose)
+		windows.CloseHandle(handleToClose)
 		handleToClose = 0
 		return
 	}
-	str = strconv.FormatUint(uint64(handleToClose), 10)
 	return
 }

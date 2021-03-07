@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package updater
@@ -54,7 +54,7 @@ func versionNewerThanUs(candidate string) (bool, error) {
 }
 
 func findCandidate(candidates fileList) (*UpdateFound, error) {
-	prefix := fmt.Sprintf(msiArchPrefix, version.NativeArch())
+	prefix := fmt.Sprintf(msiArchPrefix, version.Arch())
 	suffix := msiSuffix
 	for name, hash := range candidates {
 		if strings.HasPrefix(name, prefix) && strings.HasSuffix(name, suffix) {

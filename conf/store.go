@@ -1,13 +1,12 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package conf
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,7 +22,7 @@ func ListConfigNames() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	files, err := ioutil.ReadDir(configFileDir)
+	files, err := os.ReadDir(configFileDir)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +33,14 @@ func ListConfigNames() ([]string, error) {
 		if len(name) <= len(configFileSuffix) || !strings.HasSuffix(name, configFileSuffix) {
 			continue
 		}
-		if !file.Mode().IsRegular() || file.Mode().Perm()&0444 == 0 {
+		if !file.Type().IsRegular() {
+			continue
+		}
+		info, err := file.Info()
+		if err != nil {
+			continue
+		}
+		if info.Mode().Perm()&0444 == 0 {
 			continue
 		}
 		name = strings.TrimSuffix(name, configFileSuffix)
@@ -60,7 +66,7 @@ func LoadFromPath(path string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	bytes, err := ioutil.ReadFile(path)
+	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

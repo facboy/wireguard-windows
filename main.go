@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019-2020 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package main
@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -68,10 +67,6 @@ func checkForWow64() {
 		var processMachine, nativeMachine uint16
 		err := windows.IsWow64Process2(windows.CurrentProcess(), &processMachine, &nativeMachine)
 		if err == nil {
-			if nativeMachine == pe.IMAGE_FILE_MACHINE_ARM64 && runtime.GOARCH == "arm" {
-				//TODO: remove this exception when Go supports arm64
-				return false, nil
-			}
 			return processMachine != pe.IMAGE_FILE_MACHINE_UNKNOWN, nil
 		}
 		if !errors.Is(err, windows.ERROR_PROC_NOT_FOUND) {
